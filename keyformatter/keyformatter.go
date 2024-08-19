@@ -1,4 +1,4 @@
-package keybeauty
+package keyformatter
 
 import (
 	"bytes"
