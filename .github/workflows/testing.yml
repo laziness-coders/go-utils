@@ -1,0 +1,33 @@
+name: Run Testing
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Label of the container job
+  runner-job:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: ["1.20", 1.21, 1.22]
+    name: ${{ matrix.os }} @ Go ${{ matrix.go }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Run Tests
+        run: |
+          go test -v -covermode=atomic -coverprofile=coverage.txt ./...
