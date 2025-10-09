@@ -1,6 +1,6 @@
 module github.com/laziness-coders/go-utils
 
-go 1.24.3
+go 1.25
 
 require (
 	github.com/bytedance/sonic v1.13.3
