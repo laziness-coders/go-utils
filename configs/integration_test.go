@@ -64,16 +64,28 @@ func TestConfigWithEnvironmentOverride(t *testing.T) {
 	testDataDir := "../testdata/configs"
 
 	// Set environment variables
-	os.Setenv("APP_NAME", "env-override-app")
-	os.Setenv("PORT", "9000")
+	err := os.Setenv("APP_NAME", "env-override-app")
+	if err != nil {
+		return
+	}
+	err = os.Setenv("PORT", "9000")
+	if err != nil {
+		return
+	}
 	defer func() {
-		os.Unsetenv("APP_NAME")
-		os.Unsetenv("PORT")
+		err := os.Unsetenv("APP_NAME")
+		if err != nil {
+			return
+		}
+		err = os.Unsetenv("PORT")
+		if err != nil {
+			return
+		}
 	}()
 
 	// Test loading configuration
 	cfg := &SimpleConfig{}
-	err := New(cfg).Load(AppEnvironmentDev, testDataDir)
+	err = New(cfg).Load(AppEnvironmentDev, testDataDir)
 	if err != nil {
 		t.Fatalf("Load() failed: %v", err)
 	}

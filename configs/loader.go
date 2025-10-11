@@ -34,7 +34,6 @@ func (cl *ConfigLoader[T]) WithViper(v *viper.Viper) *ConfigLoader[T] {
 // 2. Merge config.yaml (overrides)
 // 3. Merge config.{env}.yaml (environment-specific)
 // 4. Merge environment variables
-// 5. Validate
 func (cl *ConfigLoader[T]) Load(appEnv AppEnvironment, configPath string) error {
 	// Setup viper
 	if err := cl.setupViper(configPath); err != nil {

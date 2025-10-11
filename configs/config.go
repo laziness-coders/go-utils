@@ -14,12 +14,29 @@ const (
 	AppEnvironmentIntegration AppEnvironment = "integration"
 )
 
+func (e AppEnvironment) IsProduction() bool {
+	return e == AppEnvironmentProd
+}
+
+func (e AppEnvironment) IsDevelopment() bool {
+	return e == AppEnvironmentDev
+}
+
+func (e AppEnvironment) IsTest() bool {
+	return e == AppEnvironmentTest
+}
+
+func (e AppEnvironment) IsIntegration() bool {
+	return e == AppEnvironmentIntegration
+}
+
 // GetEnv returns the value of an environment variable or the default value if not set.
-func GetEnv(key, defaultValue string) string {
+// Typical the environment variable is "APP_ENV".
+func GetEnv(key, defaultValue string) AppEnvironment {
 	if value, exists := os.LookupEnv(key); exists {
-		return value
+		return AppEnvironment(value)
 	}
-	return defaultValue
+	return AppEnvironment(defaultValue)
 }
 
 // GetServerPort returns the port for the main service.
