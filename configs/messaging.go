@@ -8,6 +8,8 @@ type TelegramConfig struct {
 	Enabled         bool   `mapstructure:"ENABLED"`
 }
 
+type TelegramConfigs []*TelegramConfig
+
 // EmailConfig represents email/SMTP configuration.
 type EmailConfig struct {
 	SMTPHost string `mapstructure:"SMTP_HOST"`
