@@ -321,10 +321,10 @@ mysql_analytics:
 
 	// Use a wrapper struct to match the YAML structure
 	type TestConfig struct {
-		Telegrams        TelegramConfigs `mapstructure:"telegrams"`
-		MySQLPrimary     MySQLConfig     `mapstructure:"mysql_primary"`
-		MySQLSecondary   MySQLConfig     `mapstructure:"mysql_secondary"`
-		MySQLAnalytics   MySQLConfig     `mapstructure:"mysql_analytics"`
+		Telegrams      TelegramConfigs `mapstructure:"telegrams"`
+		MySQLPrimary   MySQLConfig     `mapstructure:"mysql_primary"`
+		MySQLSecondary MySQLConfig     `mapstructure:"mysql_secondary"`
+		MySQLAnalytics MySQLConfig     `mapstructure:"mysql_analytics"`
 	}
 
 	testCfg := &TestConfig{}
