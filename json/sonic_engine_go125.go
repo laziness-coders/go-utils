@@ -2,6 +2,8 @@
 
 package json
 
+import "io"
+
 type sonicEngine struct {
 	fallback Engine
 }
