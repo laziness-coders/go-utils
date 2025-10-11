@@ -1,8 +1,10 @@
 package configs
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -277,5 +279,262 @@ func TestFluentAPI(t *testing.T) {
 	err := loader.Load(AppEnvironmentDev, tempDir)
 	if err != nil {
 		t.Fatalf("Load() failed after fluent chaining: %v", err)
+	}
+}
+
+func TestLoadWithValidationSuccess(t *testing.T) {
+	cfg := &TestConfig{}
+
+	// Create a temporary directory for config files
+	tempDir := t.TempDir()
+
+	// Create config.yaml with valid data
+	configContent := `
+name: "valid-app"
+port: 8080
+timeout: "5s"
+debug: true
+database:
+  host: "localhost"
+  port: 5432
+  database: "testdb"
+  enabled: true
+`
+
+	configFile := filepath.Join(tempDir, "config.yaml")
+	if err := os.WriteFile(configFile, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	// Define validation function
+	validator := func(cfg *TestConfig) error {
+		if cfg.Name == "" {
+			return fmt.Errorf("name is required")
+		}
+		if cfg.Port <= 0 || cfg.Port > 65535 {
+			return fmt.Errorf("port must be between 1 and 65535")
+		}
+		if cfg.Database.Host == "" {
+			return fmt.Errorf("database host is required")
+		}
+		return nil
+	}
+
+	err := New(cfg).WithValidation(validator).Load(AppEnvironmentDev, tempDir)
+	if err != nil {
+		t.Fatalf("Load() with validation failed: %v", err)
+	}
+
+	// Verify config was loaded correctly
+	if cfg.Name != "valid-app" {
+		t.Errorf("Expected Name to be 'valid-app', got '%s'", cfg.Name)
+	}
+	if cfg.Port != 8080 {
+		t.Errorf("Expected Port to be 8080, got %d", cfg.Port)
+	}
+}
+
+func TestLoadWithValidationFailure(t *testing.T) {
+	cfg := &TestConfig{}
+
+	// Create a temporary directory for config files
+	tempDir := t.TempDir()
+
+	// Create config.yaml with invalid data
+	configContent := `
+name: ""
+port: 0
+database:
+  host: ""
+`
+
+	configFile := filepath.Join(tempDir, "config.yaml")
+	if err := os.WriteFile(configFile, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	// Define validation function that will fail
+	validator := func(cfg *TestConfig) error {
+		if cfg.Name == "" {
+			return fmt.Errorf("name is required")
+		}
+		if cfg.Port <= 0 {
+			return fmt.Errorf("port must be greater than 0")
+		}
+		if cfg.Database.Host == "" {
+			return fmt.Errorf("database host is required")
+		}
+		return nil
+	}
+
+	err := New(cfg).WithValidation(validator).Load(AppEnvironmentDev, tempDir)
+	if err == nil {
+		t.Fatal("Expected Load() to fail with validation error, but it succeeded")
+	}
+
+	// Check that the error message contains validation information
+	if !strings.Contains(err.Error(), "config validation failed") {
+		t.Errorf("Expected error to contain 'config validation failed', got: %v", err)
+	}
+}
+
+func TestLoadWithValidationChaining(t *testing.T) {
+	cfg := &TestConfig{}
+
+	// Create a temporary directory for config files
+	tempDir := t.TempDir()
+
+	// Create config.yaml
+	configContent := `
+name: "chained-app"
+port: 3000
+database:
+  host: "localhost"
+  port: 5432
+`
+
+	configFile := filepath.Join(tempDir, "config.yaml")
+	if err := os.WriteFile(configFile, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	// Test fluent API chaining with validation
+	validator := func(cfg *TestConfig) error {
+		if cfg.Name == "" {
+			return fmt.Errorf("name is required")
+		}
+		return nil
+	}
+
+	loader := New(cfg).WithValidation(validator)
+	if loader == nil {
+		t.Fatal("Fluent API with validation returned nil")
+	}
+
+	err := loader.Load(AppEnvironmentDev, tempDir)
+	if err != nil {
+		t.Fatalf("Load() with chained validation failed: %v", err)
+	}
+
+	// Verify config was loaded
+	if cfg.Name != "chained-app" {
+		t.Errorf("Expected Name to be 'chained-app', got '%s'", cfg.Name)
+	}
+}
+
+func TestLoadWithoutValidationCallback(t *testing.T) {
+	cfg := &TestConfig{}
+
+	// Create a temporary directory for config files
+	tempDir := t.TempDir()
+
+	// Create config.yaml
+	configContent := `
+name: "no-validation-app"
+port: 4000
+`
+
+	configFile := filepath.Join(tempDir, "config.yaml")
+	if err := os.WriteFile(configFile, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	// Load without validation callback - should succeed
+	err := New(cfg).Load(AppEnvironmentDev, tempDir)
+	if err != nil {
+		t.Fatalf("Load() without validation failed: %v", err)
+	}
+
+	// Verify config was loaded
+	if cfg.Name != "no-validation-app" {
+		t.Errorf("Expected Name to be 'no-validation-app', got '%s'", cfg.Name)
+	}
+}
+
+func TestValidationWithComplexConfig(t *testing.T) {
+	cfg := &TestConfig{}
+
+	// Create a temporary directory for config files
+	tempDir := t.TempDir()
+
+	// Create config.yaml with complex nested structure
+	configContent := `
+name: "complex-app"
+port: 5000
+timeout: "30s"
+debug: false
+database:
+  host: "db.example.com"
+  port: 3306
+  database: "complexdb"
+  enabled: true
+optional_db:
+  host: "optional.example.com"
+  port: 5432
+  database: "optionaldb"
+  enabled: false
+`
+
+	configFile := filepath.Join(tempDir, "config.yaml")
+	if err := os.WriteFile(configFile, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+
+	// Define comprehensive validation function
+	validator := func(cfg *TestConfig) error {
+		// Validate main config
+		if cfg.Name == "" {
+			return fmt.Errorf("name is required")
+		}
+		if cfg.Port <= 0 || cfg.Port > 65535 {
+			return fmt.Errorf("port must be between 1 and 65535")
+		}
+		if cfg.Timeout <= 0 {
+			return fmt.Errorf("timeout must be positive")
+		}
+
+		// Validate database config
+		if cfg.Database.Host == "" {
+			return fmt.Errorf("database host is required")
+		}
+		if cfg.Database.Port <= 0 || cfg.Database.Port > 65535 {
+			return fmt.Errorf("database port must be between 1 and 65535")
+		}
+		if cfg.Database.Database == "" {
+			return fmt.Errorf("database name is required")
+		}
+
+		// Validate optional database if present
+		if cfg.OptionalDB != nil {
+			if cfg.OptionalDB.Host == "" {
+				return fmt.Errorf("optional database host cannot be empty if database is specified")
+			}
+			if cfg.OptionalDB.Port <= 0 || cfg.OptionalDB.Port > 65535 {
+				return fmt.Errorf("optional database port must be between 1 and 65535")
+			}
+		}
+
+		return nil
+	}
+
+	err := New(cfg).WithValidation(validator).Load(AppEnvironmentDev, tempDir)
+	if err != nil {
+		t.Fatalf("Load() with complex validation failed: %v", err)
+	}
+
+	// Verify all config was loaded correctly
+	if cfg.Name != "complex-app" {
+		t.Errorf("Expected Name to be 'complex-app', got '%s'", cfg.Name)
+	}
+	if cfg.Port != 5000 {
+		t.Errorf("Expected Port to be 5000, got %d", cfg.Port)
+	}
+	if cfg.Database.Host != "db.example.com" {
+		t.Errorf("Expected Database.Host to be 'db.example.com', got '%s'", cfg.Database.Host)
+	}
+	if cfg.OptionalDB == nil {
+		t.Error("Expected OptionalDB to be set")
+	} else if cfg.OptionalDB.Host != "optional.example.com" {
+		t.Errorf("Expected OptionalDB.Host to be 'optional.example.com', got '%s'", cfg.OptionalDB.Host)
 	}
 }

@@ -10,8 +10,9 @@ import (
 // ConfigLoader is a generic configuration loader that provides a fluent API
 // for loading configuration files with defaults, validation, and merging.
 type ConfigLoader[T any] struct {
-	config *T
-	viper  *viper.Viper
+	config    *T
+	viper     *viper.Viper
+	validator func(*T) error
 }
 
 // New creates a new ConfigLoader for the given config struct.
@@ -28,12 +29,34 @@ func (cl *ConfigLoader[T]) WithViper(v *viper.Viper) *ConfigLoader[T] {
 	return cl
 }
 
+// WithValidation sets a validation callback that will be called after the config is loaded.
+// The callback should return an error if the configuration is invalid.
+//
+// Example:
+//
+//	cfg := &MyConfig{}
+//	err := New(cfg).WithValidation(func(cfg *MyConfig) error {
+//	    if cfg.Port <= 0 {
+//	        return fmt.Errorf("port must be positive")
+//	    }
+//	    if cfg.Database.Host == "" {
+//	        return fmt.Errorf("database host is required")
+//	    }
+//	    return nil
+//	}).Load(AppEnvironmentDev, "./configs")
+func (cl *ConfigLoader[T]) WithValidation(validator func(*T) error) *ConfigLoader[T] {
+	cl.validator = validator
+	return cl
+}
+
 // Load loads the configuration from files and environment variables.
 // Simplified flow:
 // 1. Load config.example.yaml (base)
 // 2. Merge config.yaml (overrides)
 // 3. Merge config.{env}.yaml (environment-specific)
 // 4. Merge environment variables
+// 5. Unmarshal into config struct
+// 6. Run validation callback if provided
 func (cl *ConfigLoader[T]) Load(appEnv AppEnvironment, configPath string) error {
 	// Setup viper
 	if err := cl.setupViper(configPath); err != nil {
@@ -57,6 +80,13 @@ func (cl *ConfigLoader[T]) Load(appEnv AppEnvironment, configPath string) error 
 	// Unmarshal into the config struct
 	if err := cl.viper.Unmarshal(cl.config); err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
+	}
+
+	// Run validation callback if provided
+	if cl.validator != nil {
+		if err := cl.validator(cl.config); err != nil {
+			return fmt.Errorf("config validation failed: %w", err)
+		}
 	}
 
 	return nil
