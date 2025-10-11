@@ -3,11 +3,13 @@ package xls
 import (
 	"context"
 	"fmt"
-	"github.com/laziness-coders/structs"
-	"github.com/xuri/excelize/v2"
 	"io"
 	"reflect"
+	"strconv"
 	"strings"
+
+	"github.com/laziness-coders/structs"
+	"github.com/xuri/excelize/v2"
 )
 
 type Reader interface {
@@ -156,10 +158,39 @@ func (x *readerImpl) getToValue(field *structs.Field, stringValue string) (inter
 	case reflect.Int, reflect.Float32, reflect.Float64, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		// remove "," from string
 		stringValue = strings.ReplaceAll(stringValue, stringNumberDelimiter, emptyString)
+		// Convert string to appropriate numeric type
+		convertedValue, err := x.convertStringToNumeric(stringValue, fieldKind)
+		if err != nil {
+			return nil, err
+		}
+		return convertedValue, nil
 	}
 
-	// if err := utils.Copy(&to, stringValue); err != nil {
-	// 	return nil, err
-	// }
 	return to, nil
+}
+
+// convertStringToNumeric converts a string to the appropriate numeric type
+func (x *readerImpl) convertStringToNumeric(stringValue string, kind reflect.Kind) (interface{}, error) {
+	switch kind {
+	case reflect.Int:
+		return strconv.Atoi(stringValue)
+	case reflect.Int8:
+		val, err := strconv.ParseInt(stringValue, 10, 8)
+		return int8(val), err
+	case reflect.Int16:
+		val, err := strconv.ParseInt(stringValue, 10, 16)
+		return int16(val), err
+	case reflect.Int32:
+		val, err := strconv.ParseInt(stringValue, 10, 32)
+		return int32(val), err
+	case reflect.Int64:
+		return strconv.ParseInt(stringValue, 10, 64)
+	case reflect.Float32:
+		val, err := strconv.ParseFloat(stringValue, 32)
+		return float32(val), err
+	case reflect.Float64:
+		return strconv.ParseFloat(stringValue, 64)
+	default:
+		return nil, fmt.Errorf("unsupported numeric type: %v", kind)
+	}
 }

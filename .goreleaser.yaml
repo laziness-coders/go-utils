@@ -1,0 +1,14 @@
+project_name: go-utils
+
+before:
+  hooks:
+    - go test ./...
+
+builds:
+  - skip: true
+
+changelog:
+  sort: asc
+
+release:
+  draft: true
