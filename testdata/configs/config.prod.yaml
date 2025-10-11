@@ -1,0 +1,4 @@
+APP_NAME: "prod-app"
+APP_ENV: "prod"
+PORT: 80
+HOST: "prod.example.com"

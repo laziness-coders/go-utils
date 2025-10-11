@@ -1,0 +1,8 @@
+app_name: ""
+app_env: "invalid"
+database:
+  port: 99999
+redis:
+  port: -1
+telegram:
+  channel_id: -1
