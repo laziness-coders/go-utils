@@ -102,22 +102,22 @@ func (cl *ConfigLoader[T]) setupViper(configPath string) error {
 
 // loadBaseConfig loads the base configuration files.
 func (cl *ConfigLoader[T]) loadBaseConfig() error {
-	// First, try to load config.example.yaml as base defaults
+	// Try to load config.example.yaml as base defaults
 	cl.viper.SetConfigName("config.example")
-	if err := cl.viper.ReadInConfig(); err != nil {
-		// If config.example.yaml doesn't exist, try config.yaml instead
+	if err := cl.viper.ReadInConfig(); err == nil {
+		// If config.example.yaml exists, try to merge config.yaml on top
 		cl.viper.SetConfigName("config")
-		if err := cl.viper.ReadInConfig(); err != nil {
-			// If neither exists, that's okay - we'll use defaults and env vars
-			return nil
-		}
-	} else {
-		// If config.example.yaml exists, now try to merge config.yaml on top
-		cl.viper.SetConfigName("config")
-		if err := cl.viper.MergeInConfig(); err != nil {
-			// If config.yaml doesn't exist, that's okay - we'll use config.example.yaml
-		}
+		_ = cl.viper.MergeInConfig() // ignore error if config.yaml doesn't exist
+		return nil
 	}
+
+	// If config.example.yaml doesn't exist, try config.yaml instead
+	cl.viper.SetConfigName("config")
+	if err := cl.viper.ReadInConfig(); err != nil {
+		// If neither exists, that's okay - we'll use defaults and env vars
+		return nil
+	}
+
 	return nil
 }
 
