@@ -207,8 +207,8 @@ logger.Trace(ctx).Info("processing request") // Includes trace_id and span_id
 #### Datadog
 ```go
 // Datadog trace context is automatically extracted
-ctx := context.WithValue(context.Background(), "dd.trace_id", "12345")
-ctx = context.WithValue(ctx, "dd.span_id", "67890")
+ctx := context.WithValue(context.Background(), "trace_id", "12345")
+ctx = context.WithValue(ctx, "span_id", "67890")
 logger.Trace(ctx).Info("processing request") // Includes dd.trace_id and dd.span_id
 ```
 

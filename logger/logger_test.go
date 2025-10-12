@@ -11,6 +11,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// contextKey is a custom type for context keys to avoid collisions
+type contextKey string
+
+const (
+	traceIDKey contextKey = "trace_id"
+	spanIDKey  contextKey = "span_id"
+)
+
 func TestNew(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -89,8 +97,8 @@ func TestLogger_Trace(t *testing.T) {
 	)
 
 	// Test with context containing trace info
-	ctx := context.WithValue(context.Background(), "dd.trace_id", "12345")
-	ctx = context.WithValue(ctx, "dd.span_id", "67890")
+	ctx := context.WithValue(context.Background(), traceIDKey, "12345")
+	ctx = context.WithValue(ctx, spanIDKey, "67890")
 
 	tracedLogger := logger.Trace(ctx)
 	if tracedLogger == nil {
@@ -128,7 +136,7 @@ func TestSugaredLogger_Trace(t *testing.T) {
 	sugar := logger.Sugar()
 
 	// Test trace with sugar logger
-	ctx := context.WithValue(context.Background(), "trace_id", "test-trace")
+	ctx := context.WithValue(context.Background(), traceIDKey, "test-trace")
 	tracedSugar := sugar.Trace(ctx)
 	if tracedSugar == nil {
 		t.Error("Trace() on sugar logger returned nil")
@@ -171,8 +179,8 @@ func TestGlobalTrace(t *testing.T) {
 		t.Fatalf("Failed to initialize global logger: %v", err)
 	}
 
-	ctx := context.WithValue(context.Background(), "dd.trace_id", "global-trace")
-	ctx = context.WithValue(ctx, "dd.span_id", "global-span")
+	ctx := context.WithValue(context.Background(), traceIDKey, "global-trace")
+	ctx = context.WithValue(ctx, spanIDKey, "global-span")
 
 	tracedLogger := Trace(ctx)
 	if tracedLogger == nil {

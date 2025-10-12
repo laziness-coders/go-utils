@@ -7,14 +7,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// contextKey is a custom type for context keys to avoid collisions
-type contextKey string
-
-const (
-	traceIDKey contextKey = "dd.trace_id"
-	spanIDKey  contextKey = "dd.span_id"
-)
-
 // Example demonstrates basic usage of the logger package
 func Example() {
 	// Initialize global logger with functional options
