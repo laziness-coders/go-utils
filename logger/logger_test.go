@@ -2,11 +2,12 @@ package logger
 
 import (
 	"context"
-	"go.opentelemetry.io/otel"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/zap"
 )
 
@@ -312,14 +313,16 @@ func TestExtractTraceFields(t *testing.T) {
 			expected: 0,
 		},
 		{
-			name: "context with trace_id and span_id",
+			name: "context with OpenTelemetry span",
 			ctx: func() context.Context {
+				// Set up a tracer provider to generate valid spans
+				tp := trace.NewTracerProvider()
+				otel.SetTracerProvider(tp)
+
 				ctx := context.Background()
 				tracer := otel.Tracer("test-tracer")
 				ctx, span := tracer.Start(ctx, "test-span")
-				ctx = context.WithValue(ctx, "trace_id", "abc123")
-				ctx = context.WithValue(ctx, "span_id", "def456")
-				_ = span
+				defer span.End()
 				return ctx
 			}(),
 			expected: 2,
