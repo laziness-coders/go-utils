@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"flag"
 	"os"
 )
 
@@ -37,6 +38,12 @@ func GetEnv(key, defaultValue string) AppEnvironment {
 		return AppEnvironment(value)
 	}
 	return AppEnvironment(defaultValue)
+}
+
+func ParseConfigDir(defaultDir string) string {
+	var configDir string
+	flag.StringVar(&configDir, "config-dir", defaultDir, "Configuration directory")
+	return configDir
 }
 
 // GetServerPort returns the port for the main service.
