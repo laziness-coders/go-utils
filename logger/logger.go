@@ -10,17 +10,23 @@ var (
 	globalLogger *Logger
 )
 
-// Global logger functions
+// GetLogger returns the global logger instance.
+// It panics if the logger is not initialized.
+func GetLogger() *Logger {
+	if globalLogger == nil {
+		panic("global logger is not initialized")
+	}
+	return globalLogger
+}
 
 // Init initializes the global logger with functional options.
 // This should be called once at application startup.
-func Init(opts ...Option) error {
+func Init(opts ...Option) {
 	logger, err := newLogger(opts...)
 	if err != nil {
-		return err
+		panic(err)
 	}
 	globalLogger = logger
-	return nil
 }
 
 func Info(msg string, fields ...zap.Field) {

@@ -10,13 +10,10 @@ import (
 // Example demonstrates basic usage of the logger package
 func Example() {
 	// Initialize global logger with functional options
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		panic(err)
-	}
 
 	// Basic logging
 	Info("application started")
@@ -56,7 +53,7 @@ func Example() {
 // ExampleFile demonstrates file output with rotation
 func ExampleFile() {
 	// File output with rotation using functional options
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFileOutput("/tmp/example.log"),
 		WithMaxSize(1), // 1MB for testing
@@ -64,9 +61,6 @@ func ExampleFile() {
 		WithMaxBackups(2),
 		WithCompress(false),
 	)
-	if err != nil {
-		panic(err)
-	}
 
 	// These logs will go to file
 	Info("this goes to file")

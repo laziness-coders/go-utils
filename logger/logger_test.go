@@ -145,13 +145,10 @@ func TestSugaredLogger_Trace(t *testing.T) {
 
 func TestGlobalLogger(t *testing.T) {
 	// Initialize global logger for testing
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		t.Fatalf("Failed to initialize global logger: %v", err)
-	}
 
 	// Test global logger functions
 	Info("test global info")
@@ -171,13 +168,10 @@ func TestGlobalLogger(t *testing.T) {
 
 func TestGlobalTrace(t *testing.T) {
 	// Initialize global logger for testing
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		t.Fatalf("Failed to initialize global logger: %v", err)
-	}
 
 	ctx := context.WithValue(context.Background(), traceIDKey, "global-trace")
 	ctx = context.WithValue(ctx, spanIDKey, "global-span")
@@ -190,13 +184,10 @@ func TestGlobalTrace(t *testing.T) {
 
 func TestGlobalSugar(t *testing.T) {
 	// Initialize global logger for testing
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		t.Fatalf("Failed to initialize global logger: %v", err)
-	}
 
 	sugar := Sugar()
 	if sugar == nil {
@@ -212,13 +203,10 @@ func TestGlobalSugar(t *testing.T) {
 
 func TestGlobalWith(t *testing.T) {
 	// Initialize global logger for testing
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		t.Fatalf("Failed to initialize global logger: %v", err)
-	}
 
 	withLogger := With(zap.String("service", "test"))
 	if withLogger == nil {
@@ -404,13 +392,10 @@ func TestDirectoryPath(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	// Test successful initialization
-	err := Init(
+	Init(
 		WithLevel(LevelInfo),
 		WithFormat(FormatJSON),
 	)
-	if err != nil {
-		t.Errorf("Init() error = %v, want nil", err)
-	}
 
 	// Test that we can use global logger
 	Info("test message")
@@ -418,13 +403,10 @@ func TestInit(t *testing.T) {
 
 func TestInitWithOptions(t *testing.T) {
 	// Test functional options
-	err := Init(
+	Init(
 		WithLevel(LevelDebug),
 		WithFormat(FormatText),
 	)
-	if err != nil {
-		t.Errorf("InitWithOptions() error = %v, want nil", err)
-	}
 
 	// Test that we can use global logger
 	Debug("test debug message")
