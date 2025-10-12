@@ -16,3 +16,5 @@
 
 # goland
 .idea
+
+logger/logs
