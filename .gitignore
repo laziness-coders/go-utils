@@ -16,3 +16,9 @@
 
 # goland
 .idea
+
+# logger
+logger/logs
+
+# test
+coverage.*

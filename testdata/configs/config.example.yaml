@@ -1,0 +1,4 @@
+APP_NAME: "example-app"
+APP_ENV: "dev"
+PORT: 3000
+HOST: "0.0.0.0"

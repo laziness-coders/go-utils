@@ -1,0 +1,4 @@
+APP_NAME: "override-app"
+APP_ENV: "dev"
+PORT: 8080
+HOST: "0.0.0.0"
