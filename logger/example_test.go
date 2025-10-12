@@ -42,13 +42,13 @@ func Example() {
 
 	// Context with tracing
 	ctx := context.WithValue(context.Background(), "dd.trace_id", "12345")
-	ctx = context.WithValue(ctx, "dd.span_id", "67890")
+	ctxWithValue := context.WithValue(ctx, "dd.span_id", "67890")
 
 	Trace(ctx).Info("processing request")
 	Trace(ctx).Warn("warning with trace", zap.Int("count", 5))
 
 	// Sugar with tracing
-	sugar.Trace(ctx).Infow("processing with trace",
+	sugar.Trace(ctxWithValue).Infow("processing with trace",
 		"request_id", "req-123",
 	)
 }

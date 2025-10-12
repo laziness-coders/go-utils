@@ -126,9 +126,6 @@ func TestSugaredLogger_Trace(t *testing.T) {
 	)
 
 	sugar := logger.Sugar()
-	if sugar == nil {
-		t.Error("Sugar() returned nil")
-	}
 
 	// Test trace with sugar logger
 	ctx := context.WithValue(context.Background(), "trace_id", "test-trace")
@@ -217,6 +214,7 @@ func TestGlobalWith(t *testing.T) {
 	withLogger := With(zap.String("service", "test"))
 	if withLogger == nil {
 		t.Error("Global With() returned nil")
+		return
 	}
 
 	withLogger.Info("test with fields")
@@ -434,6 +432,7 @@ func TestNewWithOptions(t *testing.T) {
 	}
 	if logger == nil {
 		t.Error("NewWithOptions() returned nil logger")
+		return
 	}
 
 	// Test that logger works
@@ -445,6 +444,7 @@ func TestPredefinedOptions(t *testing.T) {
 	logger, err := newLogger(WithProductionDefaults())
 	if err != nil {
 		t.Errorf("newLogger(WithProductionDefaults()) error = %v", err)
+		return
 	}
 	if logger == nil {
 		t.Error("newLogger(WithProductionDefaults()) returned nil logger")

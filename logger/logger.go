@@ -67,7 +67,7 @@ func Sugar() *SugaredLogger {
 func With(fields ...zap.Field) *Logger {
 	if globalLogger != nil {
 		return &Logger{
-			Logger: globalLogger.Logger.With(fields...),
+			Logger: globalLogger.With(fields...),
 		}
 	}
 	panic("global logger is not initialized")
