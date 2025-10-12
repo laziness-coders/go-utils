@@ -193,6 +193,7 @@ func TestGlobalSugar(t *testing.T) {
 	sugar := Sugar()
 	if sugar == nil {
 		t.Error("Global Sugar() returned nil")
+		return
 	}
 
 	sugar.Infow("test global sugar",
@@ -486,6 +487,7 @@ func TestNewWithoutOptions(t *testing.T) {
 	}
 	if logger == nil {
 		t.Error("newLogger() returned nil logger")
+		return
 	}
 
 	// Test that logger works

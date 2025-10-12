@@ -7,6 +7,14 @@ import (
 	"go.uber.org/zap"
 )
 
+// contextKey is a custom type for context keys to avoid collisions
+type contextKey string
+
+const (
+	traceIDKey contextKey = "dd.trace_id"
+	spanIDKey  contextKey = "dd.span_id"
+)
+
 // Example demonstrates basic usage of the logger package
 func Example() {
 	// Initialize global logger with functional options
@@ -41,8 +49,8 @@ func Example() {
 	)
 
 	// Context with tracing
-	ctx := context.WithValue(context.Background(), "dd.trace_id", "12345")
-	ctxWithValue := context.WithValue(ctx, "dd.span_id", "67890")
+	ctx := context.WithValue(context.Background(), traceIDKey, "12345")
+	ctxWithValue := context.WithValue(ctx, spanIDKey, "67890")
 
 	Trace(ctx).Info("processing request")
 	Trace(ctx).Warn("warning with trace", zap.Int("count", 5))
@@ -81,8 +89,8 @@ func ExampleTrace() {
 	// In real usage, this would come from OpenTelemetry or Datadog
 
 	// Context with custom trace
-	ctx = context.WithValue(ctx, "trace_id", "custom-trace-789")
-	ctx = context.WithValue(ctx, "span_id", "custom-span-012")
+	ctx = context.WithValue(ctx, traceIDKey, "custom-trace-789")
+	ctx = context.WithValue(ctx, spanIDKey, "custom-span-012")
 
 	// All these will include trace information
 	Trace(ctx).Info("processing request")
