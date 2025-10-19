@@ -115,6 +115,13 @@ func WithErrorLevel() Option {
 	}
 }
 
+// WithCallerSkip sets the number of stack frames to skip for caller info.
+func WithCallerSkip(skip int) Option {
+	return func(cfg *Config) {
+		cfg.CallerSkip = skip
+	}
+}
+
 // WithProductionDefaults sets production-ready defaults.
 func WithProductionDefaults() Option {
 	return func(cfg *Config) {

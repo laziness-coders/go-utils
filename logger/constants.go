@@ -19,6 +19,7 @@ const (
 	defaultMaxSize    = 100 // MB
 	defaultMaxAge     = 30  // days
 	defaultMaxBackups = 3   // files
+	defaultCallerSkip = 1   // skip 1 stack frame
 
 	// Permissions for log directory
 	// Means: rwxr-xr-x

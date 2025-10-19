@@ -487,6 +487,17 @@ func TestNewWithoutOptions(t *testing.T) {
 	logger.Warn("test warn message")
 }
 
+func TestGlobalLogWithoutOptions(t *testing.T) {
+	// Initialize global logger without options (should use defaults)
+	Init()
+
+	// Test that global logger works
+	Info("test global info message", zap.String("key", "value"))
+	Debug("test global debug message")
+	Error("test global error message")
+	Warn("test global warn message")
+}
+
 func TestLogWithProductionDefaults(t *testing.T) {
 	// Initialize logger with production defaults
 	logger, err := newLogger(WithProductionDefaults())

@@ -20,6 +20,7 @@ type Config struct {
 	MaxBackups int    // max number of old log files (default: 3)
 	Compress   bool   // compress rotated files (default: false)
 	IsDev      *bool  // use zap's development config for human-readable output (default: false)
+	CallerSkip int    // caller skip for accurate logging (default: 1)
 
 	AtomicLevel zap.AtomicLevel // atomic level for dynamic level changes
 }
@@ -53,6 +54,9 @@ func (c *Config) setDefaults() *Config {
 	}
 	if c.MaxBackups <= 0 {
 		c.MaxBackups = defaultMaxBackups
+	}
+	if c.CallerSkip <= 0 {
+		c.CallerSkip = defaultCallerSkip
 	}
 
 	// Default IsDev to true if not set
@@ -171,6 +175,7 @@ func (c Config) buildZapLogger() *zap.Logger {
 		zapLogger *zap.Logger
 		zapOpts   = []zap.Option{
 			zap.AddCaller(),
+			zap.AddCallerSkip(c.CallerSkip),
 			zap.AddStacktrace(zapcore.ErrorLevel),
 		}
 	)
