@@ -1,4 +1,4 @@
-package myerrors
+package errors
 
 import (
 	"errors"
@@ -41,6 +41,7 @@ func shouldIgnore(path string) bool {
 	return false
 }
 
+// ErrorfOneLine creates a new error with formatted message and captures the caller's file and line number.
 func ErrorfOneLine(format string, a ...any) error {
 	LogError(3, 1, format, a...)
 
@@ -50,6 +51,7 @@ func ErrorfOneLine(format string, a ...any) error {
 	}
 }
 
+// Errorf creates a new error with formatted message and captures the caller's file and line number.
 func Errorf(format string, a ...any) error {
 	LogError(3, 20, format, a...)
 
